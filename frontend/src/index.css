@@ -1,4 +1,4 @@
-@import "./modern-normalize.css";
+@import './modern-normalize.css';
 
 @import url(https://fonts.googleapis.com/css?family=Rajdhani:300);
 
@@ -27,7 +27,7 @@
   --cockpit-hud-warning-dark-color: #cc7900;
   --cockpit-black-color: #212121;
 
-  font-family: "Rajdhani", Inter, system-ui, Avenir, Helvetica, Arial,
+  font-family: 'Rajdhani', Inter, system-ui, Avenir, Helvetica, Arial,
     sans-serif;
   font-size: var(--cockpit-md-font-size);
   line-height: 1.5;

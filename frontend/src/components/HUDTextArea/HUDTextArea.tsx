@@ -13,8 +13,8 @@ interface HUDTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 }
 
 export const HUDTextArea = forwardRef<
-HTMLTextAreaElement | null,
-HUDTextAreaProps
+  HTMLTextAreaElement | null,
+  HUDTextAreaProps
 >(function HUDTextAreaComponent(
   {
     className,

@@ -41,7 +41,7 @@ export function HUDAstronautList({
   onDelete,
   onEdit,
   style,
-}: AstronautListProps) {
+}: Readonly<AstronautListProps>) {
   const componentClassNames = classnames(styles.astronautlist, className);
 
   // Empty astronaut list
@@ -80,7 +80,7 @@ export function HUDAstronautList({
               onDelete({ id, firstname, lastname, planetOfOrigin });
 
             return (
-              <HUDListItem hasBorder={!isLastElement}>
+              <HUDListItem hasBorder={!isLastElement} key={id}>
                 <Flexbox
                   justifyContent="space-between"
                   className={styles.astronautlistContent}

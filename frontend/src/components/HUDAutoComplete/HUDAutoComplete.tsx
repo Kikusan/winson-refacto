@@ -4,31 +4,32 @@ import {
   forwardRef,
   InputHTMLAttributes,
   useEffect,
+  useMemo,
   useState,
-} from "react";
+} from 'react';
 
 // Libs
-import classnames from "classnames";
+import classnames from 'classnames';
 
 // Components
-import { HUDListItem } from "../HUDListItem";
+import { HUDListItem } from '../HUDListItem';
 
 // Helper
-import { waitMs } from "../../pages/Cockpit/helper";
+import { waitMs } from '../../helpers/waitMs';
 
 // Hooks
-import { useFetch } from "../../hooks/useFetch";
+import { useFetch } from '../../hooks/useFetch';
 
 // Error
-import { FetchError } from "../../errors/FetchError";
+import { FetchError } from '../../errors/FetchError';
 
 // Styles
-import styles from "./HUDAutoComplete.module.css";
+import styles from './HUDAutoComplete.module.css';
 
 interface HUDAutoCompleteProps
   extends Omit<
     InputHTMLAttributes<HTMLInputElement>,
-    "onChange" | "defaultValue"
+    'onChange' | 'defaultValue'
   > {
   error?: string;
   fetchOptions: (
@@ -67,7 +68,7 @@ export const HUDAutoComplete = forwardRef<
     placeholder,
     required = false,
     style,
-    type = "text",
+    type = 'text',
   },
   ref,
 ) {
@@ -92,12 +93,10 @@ export const HUDAutoComplete = forwardRef<
   });
   const [selectedOption, setSelectedOption] =
     useState<AutoCompleteOptionType | null>();
-
-  const {
-    isLoading,
-    data,
-    error: fetchError,
-  } = useFetch((options?: RequestInit) => fetchOptions(undefined, options));
+  const getOptions = useMemo(() => {
+    return (options?: RequestInit) => fetchOptions(undefined, options);
+  }, []);
+  const { isLoading, data, error: fetchError } = useFetch(getOptions);
 
   useEffect(() => {
     setOptions({

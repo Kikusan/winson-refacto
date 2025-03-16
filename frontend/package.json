@@ -9,12 +9,11 @@
     "lint": "eslint --ext ts,tsx --report-unused-disable-directives --max-warnings 0 && prettier . --check && tsc",
     "format": "eslint --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix && prettier . --write",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --reporter verbose --watch",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "classnames": "2.3.2",
-    "msw": "2.0.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-error-boundary": "^4.0.12",
@@ -22,12 +21,16 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
     "@vitejs/plugin-react": "4.0.3",
+    "@vitest/coverage-istanbul": "^3.0.4",
+    "esbuild": "^0.24.2",
     "eslint": "8.2.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "17.1.0",
@@ -37,12 +40,14 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.3",
     "happy-dom": "^12.10.3",
+    "jsdom": "^26.0.0",
     "prettier": "3.0.3",
     "typescript": "5.2.2",
     "vite": "4.4.5",
     "vite-plugin-pwa": "0.16.7",
     "vite-plugin-svgr": "^4.1.0",
-    "vitest": "0.34.6"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.4"
   },
   "msw": {
     "workerDirectory": "public"

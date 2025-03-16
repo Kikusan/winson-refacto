@@ -16,11 +16,13 @@ function HUDAstronautListError() {
   );
 }
 
+type AstronautListErrorBoundaryProps = Readonly<{
+  children: ReactNode;
+}>;
+
 export function AstronautListErrorBoundary({
   children,
-}: {
-  children: ReactNode;
-}) {
+}: AstronautListErrorBoundaryProps) {
   return (
     <ErrorBoundary FallbackComponent={HUDAstronautListError}>
       {children}

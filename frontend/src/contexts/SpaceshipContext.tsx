@@ -1,5 +1,12 @@
 // React
-import { createContext, useState, useContext, ReactNode } from 'react';
+import {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useMemo,
+  useCallback,
+} from 'react';
 
 // Error
 import { FetchError } from '../errors/FetchError';
@@ -28,27 +35,33 @@ const initialSpaceshipContext: SpaceshipContextType = {
 
 const SpaceshipContext = createContext(initialSpaceshipContext);
 
-export function SpaceshipProvider({ children }: { children: ReactNode }) {
+export function SpaceshipProvider({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   const [spaceshipState, setSpaceshipState] = useState<SpaceshipContextType>(
     initialSpaceshipContext,
   );
 
-  const updateSpaceshipContext = (
-    stateToUpdate: Partial<SpaceshipContextType>,
-  ) => {
-    setSpaceshipState((prevState) => ({
-      ...prevState,
-      ...stateToUpdate,
-    }));
-  };
+  const updateSpaceshipContext = useCallback(
+    (stateToUpdate: Partial<SpaceshipContextType>) => {
+      setSpaceshipState((prevState) => ({
+        ...prevState,
+        ...stateToUpdate,
+      }));
+    },
+    [],
+  );
+
+  const value = useMemo(
+    () => ({
+      ...spaceshipState,
+      updateSpaceshipContext,
+    }),
+    [spaceshipState, updateSpaceshipContext],
+  );
 
   return (
-    <SpaceshipContext.Provider
-      value={{
-        ...spaceshipState,
-        updateSpaceshipContext,
-      }}
-    >
+    <SpaceshipContext.Provider value={value}>
       {children}
     </SpaceshipContext.Provider>
   );

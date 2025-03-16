@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { HUDSnackbar } from './components/HUDSnackbar';
 
 // Helpers
-import { waitMs } from './pages/Cockpit/helper';
+import { waitMs } from '@helpers/waitMs.ts';
 
 // Context
 import { useMessageCenterContext } from './contexts/MessageCenterContext.tsx';

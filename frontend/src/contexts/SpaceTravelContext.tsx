@@ -1,17 +1,24 @@
 // React
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useMemo,
+  useCallback,
+} from 'react';
 
 // Error
 import { FetchError } from '../errors/FetchError';
 import { ContextError } from '../errors/ContextError';
 
 // API
-import { NoWhere, Planet } from '../api/planet.api';
+import { Planet } from '../api/planet.api';
 
 type SpaceTravelContextType = {
   isTraveling: boolean;
   selectedPlanetForSpaceTravel?: Planet;
-  currentPlanet: Planet | NoWhere;
+  currentPlanet?: Planet;
   planetList: {
     isLoading: boolean;
     planetList?: Planet[] | null;
@@ -24,7 +31,7 @@ type SpaceTravelContextType = {
 
 const initialSpaceTravelContext: SpaceTravelContextType = {
   isTraveling: false,
-  currentPlanet: 'NO_WHERE',
+  currentPlanet: undefined,
   planetList: {
     isLoading: false,
   },
@@ -33,26 +40,36 @@ const initialSpaceTravelContext: SpaceTravelContextType = {
 
 const SpaceTravelContext = createContext(initialSpaceTravelContext);
 
-export function SpaceTravelProvider({ children }: { children: ReactNode }) {
+export function SpaceTravelProvider({
+  children,
+  defaultCurrentPlanet,
+}: Readonly<{ children: ReactNode; defaultCurrentPlanet?: Planet }>) {
   const [spaceTravelState, setSpaceTravelState] =
-    useState<SpaceTravelContextType>(initialSpaceTravelContext);
+    useState<SpaceTravelContextType>({
+      ...initialSpaceTravelContext,
+      currentPlanet: defaultCurrentPlanet,
+    });
 
-  const updateSpaceTravelContext = (
-    stateToUpdate: Partial<SpaceTravelContextType>,
-  ) => {
-    setSpaceTravelState((prevState) => ({
-      ...prevState,
-      ...stateToUpdate,
-    }));
-  };
+  const updateSpaceTravelContext = useCallback(
+    (stateToUpdate: Partial<SpaceTravelContextType>) => {
+      setSpaceTravelState((prevState) => ({
+        ...prevState,
+        ...stateToUpdate,
+      }));
+    },
+    [],
+  );
+
+  const value = useMemo(
+    () => ({
+      ...spaceTravelState,
+      updateSpaceTravelContext,
+    }),
+    [spaceTravelState, updateSpaceTravelContext],
+  );
 
   return (
-    <SpaceTravelContext.Provider
-      value={{
-        ...spaceTravelState,
-        updateSpaceTravelContext,
-      }}
-    >
+    <SpaceTravelContext.Provider value={value}>
       {children}
     </SpaceTravelContext.Provider>
   );
@@ -122,10 +139,15 @@ export function usePlanetList(): {
   setPlanetList: (planetList: SpaceTravelContextType['planetList']) => void;
 } {
   const { planetList, updateSpaceTravelContext } = useSpaceTravelContext();
-
+  const setPlanetList = useCallback(
+    (planetListFromSpaceTravelContext: SpaceTravelContextType['planetList']) =>
+      updateSpaceTravelContext({
+        planetList: planetListFromSpaceTravelContext,
+      }),
+    [updateSpaceTravelContext],
+  );
   return {
     planetList,
-    setPlanetList: (planetList: SpaceTravelContextType['planetList']) =>
-      updateSpaceTravelContext({ planetList }),
+    setPlanetList,
   };
 }

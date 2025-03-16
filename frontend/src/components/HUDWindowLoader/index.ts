@@ -1,1 +1,1 @@
-export * from "./HUDWindowLoader";
+export * from './HUDWindowLoader';

@@ -1,4 +1,3 @@
-// React
 import { FormHTMLAttributes } from 'react';
 
 interface FormProps extends FormHTMLAttributes<HTMLFormElement> {}

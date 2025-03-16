@@ -1,12 +1,12 @@
 // Libs
 import { Children, cloneElement, ReactElement, ReactNode } from 'react';
 
-type PerspectiveProps = {
+type PerspectiveProps = Readonly<{
   children: ReactNode;
   className?: string;
   transform: string;
   value: string;
-};
+}>;
 
 export function Perspective({
   children,

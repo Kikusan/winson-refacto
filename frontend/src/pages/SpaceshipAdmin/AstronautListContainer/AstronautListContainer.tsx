@@ -1,94 +1,19 @@
 // Components
-import {
-  AstronautForList,
-  HUDAstronautList,
-} from "../../../components/HUDAstronautList";
-import { HUDWindowLoader } from "../../../components/HUDWindowLoader";
+import { HUDAstronautList } from './components/HUDAstronautList/index';
 
-// Context
-import { useAstronautList } from "../../../contexts/SpaceshipContext.tsx";
-import { useMessageCenter } from "../../../contexts/MessageCenterContext.tsx";
+import styles from './AstronautListContainer.module.css';
+import { FetchAstronautProvider } from '../contexts/astronautContext.tsx';
+import { AstronautService } from '../services/AstronautService';
 
-// Types
-// API
-import { Astronaut, deleteAstronautAPICall } from "../../../api/astronaut.api";
-
-// Styles
-import styles from "./AstronautListContainer.module.css";
-
-function mapAstronautList(astronautList?: Astronaut[] | null) {
-  if (!astronautList) {
-    return [];
-  }
-
-  return astronautList.map(
-    ({ id, firstname, lastname, originPlanet }: Astronaut) => ({
-      id,
-      firstname,
-      lastname,
-      planetOfOrigin: originPlanet.name,
-    }),
-  );
-}
-
-type AstronautListContainerProps = {
-  handleNavigateToCreateOrEditAstronaut: (astronautId: number) => void;
-};
-
-export function AstronautListContainer({
-  handleNavigateToCreateOrEditAstronaut,
-}: Readonly<AstronautListContainerProps>) {
-  const {
-    astronautList: { isLoading, astronautList: astronauts, error },
-    setAstronautList,
-  } = useAstronautList();
-  const { pushInfoMessage, pushErrorMessage } = useMessageCenter();
-
-  const handleDeleteAstronaut = async (astronaut: AstronautForList) => {
-    const astronautToDelete = astronauts?.find(
-      (astro: Astronaut) => astronaut.id === astro.id,
-    );
-    try {
-      const newAstronautList = astronauts?.filter(
-        (astro: Astronaut) => astro.id !== astronaut.id,
-      );
-      setAstronautList({ isLoading: false, astronautList: newAstronautList });
-      await deleteAstronautAPICall(astronaut.id);
-      pushInfoMessage(
-        `Astronaut ${astronautToDelete?.firstname} ${astronautToDelete?.lastname} has been deleted from Eleven Labs space service`,
-      );
-    } catch (e) {
-      setAstronautList({ isLoading: false, astronautList: astronauts });
-      pushErrorMessage(
-        `Cannot delete ${astronautToDelete?.firstname} ${astronautToDelete?.lastname} from the Eleven Labs space service`,
-      );
-    }
-  };
-
-  if (error) {
-    pushErrorMessage("Eleven Labs space services are not online ...");
-    throw error;
-  }
-
+export function AstronautListContainer() {
+  const fetchAstronautService = new AstronautService();
   return (
-    <>
-      {isLoading ? (
-        <HUDWindowLoader
-          label="astronaut in the spaceship"
-          className={styles.astronautlistcontainer}
-        />
-      ) : (
-        <HUDAstronautList
-          label="astronauts in the spaceship"
-          astronautList={mapAstronautList(astronauts)}
-          onEdit={({ id }: AstronautForList) =>
-            handleNavigateToCreateOrEditAstronaut(id)
-          }
-          onDelete={handleDeleteAstronaut}
-          className={styles.astronautlistcontainer}
-          emptyAstronautListMessage="Any astronaut in your spaceship"
-        />
-      )}
-    </>
+    <FetchAstronautProvider service={fetchAstronautService}>
+      <HUDAstronautList
+        label="astronauts in the spaceship"
+        className={styles.astronautlistcontainer}
+        emptyAstronautListMessage="Any astronaut in your spaceship"
+      />
+    </FetchAstronautProvider>
   );
 }

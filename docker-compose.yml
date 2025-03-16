@@ -1,51 +1,113 @@
-version: "3.5"
+# version: "3.5"
+
+# services:
+#   init-remove-gitkeep:
+#     image: busybox
+#     volumes:
+#       - ./mysql:/var/lib/mysql
+#       - ./remove_gitkeep.sh:/remove_gitkeep.sh
+#     entrypoint: ["/bin/sh", "-c", "/remove_gitkeep.sh"]
+#     restart: "no"
+
+#   db-eleven-test:
+#     image: mysql:8.2.0
+#     restart: always
+#     container_name: db-eleven-test
+#     ports:
+#       - "3306:3306"
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=eleven11
+#       - MYSQL_USER=eleven
+#       - MYSQL_PASSWORD=eleven11
+#       - MYSQL_DATABASE=eleven
+#     volumes:
+#       - ./mysql:/var/lib/mysql
+#     healthcheck:
+#       test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u eleven --password=eleven11 || exit 1" ]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#     depends_on:
+#       - init-remove-gitkeep
+
+#   server-eleven-test:
+#     depends_on:
+#       db-eleven-test:
+#         condition: service_healthy
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "4000:4000"
+#     environment:
+#       DB_HOST: db-eleven-test
+#       DB_USER: eleven
+#       DB_PASSWORD: eleven11
+#       DB_NAME: eleven
+#     volumes:
+#       - ./backend:/app/
+#       - /app/node_modules
+
+#   front-eleven-test:
+#     restart: always
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     volumes:
+#       - ./frontend/:/app/
+#       - /app/node_modules
+#     ports:
+#       - "3000:3000"
+version: "3.8"
 
 services:
-  init-remove-gitkeep:
-    image: busybox
-    volumes:
-      - ./mysql:/var/lib/mysql
-      - ./remove_gitkeep.sh:/remove_gitkeep.sh
-    entrypoint: ["/bin/sh", "-c", "/remove_gitkeep.sh"]
-    restart: "no"
-
-  db-eleven-test:
-    image: mysql:8.2.0
-    restart: always
-    container_name: db-eleven-test
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=eleven11
-      - MYSQL_USER=eleven
-      - MYSQL_PASSWORD=eleven11
-      - MYSQL_DATABASE=eleven
-    volumes:
-      - ./mysql:/var/lib/mysql
-    healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u eleven --password=eleven11 || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    depends_on:
-      - init-remove-gitkeep
-
-  server-eleven-test:
-    depends_on:
-      db-eleven-test:
-        condition: service_healthy
+  astronaut-api:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: ./nestjs-backend
     ports:
       - "4000:4000"
     environment:
-      DB_HOST: db-eleven-test
-      DB_USER: eleven
-      DB_PASSWORD: eleven11
-      DB_NAME: eleven
+      - DATABASE_HOST=astronaut-db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=nestjs_db
+      - FRONT_END_HOST=http://localhost:3000
+      - MIGRATION_PATH=src/migrations/**/*{.ts,.js}
+    depends_on:
+      astronaut-db:
+        condition: service_healthy
     volumes:
-      - ./backend:/code/
+      - ./nestjs-backend/src:/app/src
+
+  astronaut-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=nestjs_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  astronaut-admin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      astronaut-db:
+        condition: service_healthy
 
   front-eleven-test:
     restart: always
@@ -53,6 +115,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./frontend/:/code/
+      - ./frontend/:/app/
+      - /app/node_modules
     ports:
       - "3000:3000"
+
+volumes:
+  postgres_data:
+  pgadmin_data:

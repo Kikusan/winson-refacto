@@ -16,7 +16,16 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./", // La racine du projet
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@contexts/*": ["src/contexts/*"],
+      "@api/*": ["src/api/*"],
+      "@assets/*": ["src/assets/*"],
+      "@helpers/*": ["src/helpers/*"]
+    },
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["src", "./vite.d.ts"],
   "references": [

@@ -1,5 +1,5 @@
 // React
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { createContext, useState, useContext, ReactNode, useMemo } from 'react';
 
 // Error
 import { ContextError } from '../errors/ContextError';
@@ -18,13 +18,14 @@ type MessageCenterContextType = {
 const initialMessageCenterContext: MessageCenterContextType = {
   type: 'info',
   message: null,
-  updateMessageCenterContext: () => {
-  },
+  updateMessageCenterContext: () => {},
 };
 
 const MessageCenterContext = createContext(initialMessageCenterContext);
 
-export function MessageCenterProvider({ children }: { children: ReactNode }) {
+export function MessageCenterProvider({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   const [messageState, setMessageState] = useState<MessageCenterContextType>(
     initialMessageCenterContext,
   );
@@ -38,13 +39,16 @@ export function MessageCenterProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const value = useMemo(
+    () => ({
+      ...messageState,
+      updateMessageCenterContext,
+    }),
+    [messageState, updateMessageCenterContext],
+  );
+
   return (
-    <MessageCenterContext.Provider
-      value={{
-        ...messageState,
-        updateMessageCenterContext,
-      }}
-    >
+    <MessageCenterContext.Provider value={value}>
       {children}
     </MessageCenterContext.Provider>
   );
